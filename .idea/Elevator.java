@@ -67,15 +67,6 @@ public class Elevator {
                 double totalDistance = 0;
                 boolean endTest = false;
 
-                //if the elevator isnt moving, or the elevator is moving towards the caller's floor, add to dist and end check
-                if (elevator.isMoving = false || (elevator.getPosition() > callerFloor && elevator.getDirection() == -1)
-                        || (elevator.getPosition() < callerFloor && elevator.getDirection() == 1)) {
-
-                    totalDistance += Math.abs(elevator.getPosition() - callerFloor);
-                    endTest = true;
-
-                }
-
                 for (int j = 0; j < (elevator.getTotalDestinations() - 2) && !endTest; j++) {
                     //if elevator will move past caller add dist to caller and end test
                     if ((elevator.getPosition() > callerFloor && elevator.getDirection() == -1) ||
