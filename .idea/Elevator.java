@@ -45,6 +45,9 @@ public class Elevator {
 
     //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
     public static void callElevator(int callerFloor, int destinationFloor) {
+
+        System.out.println("CallElevator initiated.");
+
         int callerDirection;
         //callerDirection is 1 if caller is moving upwards, -1 if downwards.
         if (callerFloor < destinationFloor) {
