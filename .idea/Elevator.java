@@ -1,4 +1,3 @@
-import java.sql.Array;
 import java.util.ArrayList;
 
 public class Elevator {
@@ -39,56 +38,89 @@ public class Elevator {
         this.isPlaceholder = true;
     }
 
-    //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
-    public static void callElevator(int callerFloor) {
-        Elevator bestElevator = new Elevator();
+    //runs the elevator's movement for a given tick
+    public void tick() {
+        //unimplemented
+    }
 
+    //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
+    public static void callElevator(int callerFloor, int destinationFloor) {
+        int callerDirection;
+        //callerDirection is 1 if caller is moving upwards, -1 if downwards.
+        if (callerFloor < destinationFloor) {
+            callerDirection = 1;
+        } else {
+            callerDirection = -1;
+        }
+
+        Elevator bestElevator = new Elevator();
+        double bestDistance = 99999;
+        int pickupAppendPosition = 0;
+        int dropoffAppendPosition = 0;
+
+        //goes through all elevator objects, and sets bestElevator to the one with the best dist to pickup
         for (int i = 0; i < totalElevators; i++) {
             Elevator elevator = (Elevator) elevatorList.get(i);
-            double bestDistance = 99999;
+            double totalDistance = 0;
+            boolean endTest = false;
 
-            //if the elevator isnt moving, or the elevator is moving towards the caller's floor, check distance
-            if (elevator.isMoving = false || (elevator.getPosition() > callerFloor && elevator.getDirection() == -1)
-                    || (elevator.getPosition() < callerFloor && elevator.getDirection() == 1)) {
+            //runs for elevators with no destinations, then ends test
+            if (elevator.getTotalDestinations() == 0) {
+                totalDistance += Math.abs(elevator.getPosition() - callerFloor);
+                endTest = true;
+            }
 
-                //if this elevator is closer than the others we tested, set this elevator as best elevator
-                if (bestDistance > Math.abs(elevator.getPosition())) {
-                    bestDistance = Math.abs(elevator.getPosition());
-                    bestElevator = elevator;
+            //runs for elevator destinations 1 through n-1
+            for (int j = 0; j < (elevator.getTotalDestinations() - 1) && !endTest; j++) {
+
+                //if elevator will move past caller add the distance to the caller and end test
+                if ((((int) elevator.getDestinations().get(j) >= callerFloor) && (elevator.getDirection() == -1) && (callerDirection == -1))
+                        || (((int) elevator.getDestinations().get(j) <= callerFloor) && (elevator.getDirection() == 1) && (callerDirection == 1))) {
+
+                    totalDistance += Math.abs(elevator.getPosition() - callerFloor);
+                    endTest = true;
+
+                } else { //otherwise add distance to next destination, increment pickupAppendPosition, and continue test
+
+                    totalDistance += Math.abs((Double) elevator.getDestinations().get(j)
+                            - (Double) elevator.getDestinations().get(j + 1));
+                    pickupAppendPosition++;
                 }
+            }
+
+            //runs for the last destination
+            //add the distance from the final destination to the caller to totalDistance
+            if (!endTest) {
+                totalDistance += (Math.abs((int) elevator.getDestinations().get(elevator.getTotalDestinations() - 1) - callerFloor));
+            }
+
+            //checks if totalDistance is better than bestDistance, if so, updates bestDist and bestElevator
+            if (totalDistance < bestDistance) {
+                bestDistance = totalDistance;
+                bestElevator = elevator;
             }
         }
 
-        //if no best elevator has been found (none are valid), check moving elevators
-        if (bestElevator.getIsPlaceholder()) {
-            for (int i = 0; i < totalElevators; i++) {
-                Elevator elevator = (Elevator) elevatorList.get(i);
-                double bestDistance = 99999;
-                double totalDistance = 0;
-                boolean endTest = false;
+        //adds the destination to the best elevator
+        bestElevator.addDestination(pickupAppendPosition, callerFloor);
+    }
 
-                for (int j = 0; j < (elevator.getTotalDestinations() - 2) && !endTest; j++) {
-                    //if elevator will move past caller add dist to caller and end test
-                    if ((elevator.getPosition() > callerFloor && elevator.getDirection() == -1) ||
-                            (elevator.getPosition() < callerFloor && elevator.getDirection() == 1)) {
+    //adds a destination in the middle of an elevator's route
+    public void addDestination(int appendPosition, int floor) {
+        System.out.println("Old Pos + Dests: " + position + " and " + destinations);
+        destinations.add(appendPosition, floor);
+        System.out.println("New Pos + Dests: " + position + " and " + destinations);
+    }
 
-                        totalDistance += Math.abs(elevator.getPosition() - callerFloor);
-                        endTest = true;
-
-                    } else { //otherwise add distance to next destination and continue test
-
-                        totalDistance += Math.abs((Double) elevator.getDestinations().get(j)
-                                - (Double) elevator.getDestinations().get(j));
-
-                    }
-                }
-
-            }
-        }
-
+    //adds a destination to the end of an elevator's route
+    public void addDestination(int floor) {
+        System.out.println("Old Pos + Dests: " + position + " and " + destinations);
+        destinations.add(floor);
+        System.out.println("New Pos + Dests: " + position + " and " + destinations);
     }
 
 
+    //getter methods
     public static int getTotalElevators() {
         return totalElevators;
     }
