@@ -46,8 +46,6 @@ public class Elevator {
     //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
     public static void callElevator(int callerFloor, int destinationFloor) {
 
-        System.out.println("CallElevator initiated.");
-
         int callerDirection;
         //callerDirection is 1 if caller is moving upwards, -1 if downwards.
         if (callerFloor < destinationFloor) {
@@ -77,8 +75,12 @@ public class Elevator {
             for (int j = 0; j < (elevator.getTotalDestinations() - 1) && !endTest; j++) {
 
                 //if elevator will move past caller add the distance to the caller and end test
-                if ((((int) elevator.getDestinations().get(j) >= callerFloor) && (elevator.getDirection() == -1) && (callerDirection == -1))
-                        || (((int) elevator.getDestinations().get(j) <= callerFloor) && (elevator.getDirection() == 1) && (callerDirection == 1))) {
+                if (
+                        ((((int) elevator.getDestinations().get(j)) >= callerFloor)
+                                && (callerFloor >= ((int) elevator.getDestinations().get(j))) && (callerDirection == -1))
+                        || ((((int) elevator.getDestinations().get(j)) <= callerFloor)
+                                && (callerFloor <= ((int) elevator.getDestinations().get(j))) && (callerDirection == 1))
+                ) {
 
                     totalDistance += Math.abs(elevator.getPosition() - callerFloor);
                     endTest = true;
@@ -104,8 +106,44 @@ public class Elevator {
             }
         }
 
-        //adds the destination to the best elevator
+        //finds when the elevator will pass by the dropoff position, or will change directions away from the dropoff
+        boolean foundPosition = false;
+
+        //runs for an elevator with 0 destinations
+        if (bestElevator.getTotalDestinations() == 0) {
+            foundPosition = true;
+        }
+
+        for (int i = 0; i < ((int) bestElevator.getTotalDestinations() - 1) && !foundPosition; i++) {
+
+            //if it does NOT pass by the dropoff or start moving away, increase the append position
+            if (
+                    !(((((int) bestElevator.getDestinations().get(i)) >= destinationFloor)
+                            && (destinationFloor >= ((int) bestElevator.getDestinations().get(i + 1))))
+                            || ((((int) bestElevator.getDestinations().get(i)) <= destinationFloor)
+                            && (destinationFloor <= ((int) bestElevator.getDestinations().get(i + 1))))
+                            || (Math.abs((int) bestElevator.getDestinations().get(i)) < Math.abs((int) bestElevator.getDestinations().get(i + 1))))
+            ) {
+                dropoffAppendPosition++;
+            } else { //otherwise, we found our position
+                foundPosition = true;
+            }
+        }
+
+        //runs for the last destination
+        if (!foundPosition) {
+            dropoffAppendPosition++;
+        }
+
+        //adjusts dropoff append position to account for pickup being appended
+        if (pickupAppendPosition <= dropoffAppendPosition) {
+            dropoffAppendPosition++;
+        }
+
+        //appends the pickup and dropoff
         bestElevator.addDestination(pickupAppendPosition, callerFloor);
+        bestElevator.addDestination(dropoffAppendPosition,destinationFloor);
+
     }
 
     //adds a destination in the middle of an elevator's route

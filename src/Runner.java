@@ -5,6 +5,7 @@ public class Runner {
         Elevator e3 = new Elevator(0,0,0,0,0,3);
         Elevator e4 = new Elevator(0,0,0,0,0,4);
         Elevator.callElevator(3,4);
-
+        Elevator.callElevator(4,1);
+        Elevator.callElevator(3,2);
     }
 }
