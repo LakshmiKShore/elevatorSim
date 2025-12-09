@@ -64,7 +64,7 @@ public class Elevator {
             //removes only the immediate next instances of a specific destination
             while (destinations.get(0) == position) {
                 System.out.println(destinations.size());
-                destinations.remove(0);
+                destinations.remove(0); //BROKEN :(
             }
             //RUN DROPOFF PROTOCOL FOR TRAVELLERS
         }
