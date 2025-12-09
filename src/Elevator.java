@@ -65,6 +65,7 @@ public class Elevator {
             while (destinations.get(0) == position) {
                 System.out.println(destinations.size()); //stupid java! make me look bad
                 destinations.remove(0); //BROKEN :(
+                System.out.println(destinations.size());
             }
             //RUN DROPOFF PROTOCOL FOR TRAVELLERS
         }
