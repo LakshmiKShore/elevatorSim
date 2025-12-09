@@ -1,31 +1,29 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Elevator {
     private static int totalElevators = 0;
     private static int nextID = 0;
-    static ArrayList elevatorList = new ArrayList();
+    static ArrayList<Elevator> elevatorList = new ArrayList<>();
     private boolean isPlaceholder = false;
 
-    private double maxSpeed; //speed is in floors per tick
-    private double acceleration; //acceleration is in floors per tick per tick
+    private double speed; //speed is in floors per tick
     private int capacity;
     private int maxFloor;
     private int minFloor;
     private int id;
 
-    private double currentSpeed;
     private double position; //position is in reference to floor number
     private boolean isMoving;
     private int direction; //1 is up, -1 is down
     private int occupants;
     private int totalDestinations;
-    private ArrayList destinations = new ArrayList();
-    private ArrayList occupantList = new ArrayList();
+    private ArrayList<Integer> destinations = new ArrayList<>();
+    private ArrayList<Traveller> occupantList = new ArrayList<>();
 
     //constructor takes speed accel and capacity, increments totalelevators, adds itself to the array
-    public Elevator(double maxSpeed, double acceleration, int capacity, int minFloor, int maxFloor, int startPosition) {
-        this.maxSpeed = maxSpeed;
-        this.acceleration = acceleration;
+    public Elevator(double speed, int capacity, int minFloor, int maxFloor, int startPosition) {
+        this.speed = speed;
         this.capacity = capacity;
         this.minFloor = minFloor;
         this.maxFloor = maxFloor;
@@ -42,9 +40,32 @@ public class Elevator {
         this.isPlaceholder = true;
     }
 
-    //runs the elevator's movement for a given tick
-    public void tick() {
-        //unimplemented
+    //runs every elevator's movement.
+    public static void tick() {
+        Iterator<?> ticker = elevatorList.iterator();
+        while (elevatorList.iterator().hasNext()) {
+            Elevator ticking = (Elevator) ticker.next(); //is broken :(
+            ticking.move();
+        }
+    }
+
+    //runs an individual elevator's movement.
+    public void move() {
+        directionCheck();
+
+        //If the next destination is further than we can move in a tick, move full speed towards it
+        //otherwise, we can safely set our position to our destination
+        if (Math.abs(destinations.get(0) - position) >= speed) {
+            position += (speed * direction);
+        } else {
+            position = destinations.get(0);
+            //removes only the immediate next instances of a specific destination
+            Iterator<Integer> dests = destinations.iterator();
+            while (dests.hasNext() && dests.next() == position) {
+                destinations.remove(0);
+            }
+            //RUN DROPOFF PROTOCOL FOR TRAVELLERS
+        }
     }
 
     //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
@@ -66,7 +87,7 @@ public class Elevator {
         //goes through all elevator objects, and sets bestElevator to the one with the best dist to pickup
         for (int i = 0; i < totalElevators; i++) {
             int tempPickupAppend = 0;
-            Elevator elevator = (Elevator) elevatorList.get(i);
+            Elevator elevator = elevatorList.get(i);
             System.out.print("Running for elevator " + elevator.getID() + ": ");
             double totalDistance = 0;
             boolean endTest = false;
@@ -126,15 +147,13 @@ public class Elevator {
             foundPosition = true;
         }
 
+        //runs for an elevator with 2+ destinations, runs for dests 1 thru n-1
         for (int i = 0; i < ((int) bestElevator.getTotalDestinations() - 1) && !foundPosition; i++) {
-
-            //if it does NOT pass by the dropoff or start moving away, increase the append position
+            //if it does NOT pass by the dropoff or DOES start moving away, increase the append position
             if (
-                    !(((((int) bestElevator.getDestinations().get(i)) >= destinationFloor)
-                            && (destinationFloor >= ((int) bestElevator.getDestinations().get(i + 1))))
-                            || ((((int) bestElevator.getDestinations().get(i)) <= destinationFloor)
-                            && (destinationFloor <= ((int) bestElevator.getDestinations().get(i + 1))))
-                            || (Math.abs((int) bestElevator.getDestinations().get(i)) < Math.abs((int) bestElevator.getDestinations().get(i + 1))))
+                    (!bestElevator.passCheck(i,destinationFloor)
+                            || (Math.abs((int) bestElevator.destinations.get(i) - destinationFloor) <
+                            Math.abs((int) bestElevator.destinations.get(i+1) - destinationFloor)))
             ) {
                 dropoffAppendPosition++;
             } else { //otherwise, we found our position
@@ -145,9 +164,11 @@ public class Elevator {
         //runs for the last destination
         if (!foundPosition) {
             dropoffAppendPosition++;
+            foundPosition = true;
         }
 
         //adjusts dropoff append position to account for pickup being appended
+        System.out.println("pickup: " + pickupAppendPosition + " dropoff: " + dropoffAppendPosition);
         if (pickupAppendPosition <= dropoffAppendPosition) {
             dropoffAppendPosition++;
         }
@@ -158,6 +179,39 @@ public class Elevator {
 
     }
 
+    //Generic passCheck. Checks if the elevator will EVER pass a floor.
+    public boolean passCheck(int floor) {
+        if (totalDestinations == 0) {
+            return (false);
+        } else {
+            for (int i = 0; i < totalDestinations - 1; i++) {
+                if (    //if floor is between the elevator at dest. i and where it's going, return true
+                        ((int) destinations.get(i) >= floor && floor >= (int) destinations.get(i+1))
+                        || ((int) destinations.get(i) <= floor && floor <= (int) destinations.get(i+1))
+                ) {
+                    return true;
+                }
+            }
+
+            int d = totalDestinations - 1;
+            if (
+                    ((int) destinations.get(d) >= floor && floor >= (int) destinations.get(d+1))
+                            || ((int) destinations.get(d) <= floor && floor <= (int) destinations.get(d+1))
+            ) {
+                return true;
+            }
+        }
+        //if we haven't returned true yet, return false
+        return false;
+    }
+
+    //Specific passCheck. Checks if an elevator passes by a floor as it goes from destination index X to X+1
+    public boolean passCheck(int index, int floor) {
+        return (((int) destinations.get(index) >= floor && floor >= (int) destinations.get(index + 1))
+                || ((int) destinations.get(index) <= floor && floor <= (int) destinations.get(index + 1)));
+    }
+
+    //updates the direction that an elevator is moving. Runs every tick and after elevators get new destinations.
     public void directionCheck() {
         if (totalDestinations != 0) {
             if ((int) destinations.get(0) > position) {
@@ -190,12 +244,8 @@ public class Elevator {
         return totalElevators;
     }
 
-    public double getMaxSpeed() {
-        return maxSpeed;
-    }
-
-    public double getAcceleration() {
-        return acceleration;
+    public double getSpeed() {
+        return speed;
     }
 
     public int getCapacity() {
@@ -208,10 +258,6 @@ public class Elevator {
 
     public int getMinFloor() {
         return minFloor;
-    }
-
-    public double getCurrentSpeed() {
-        return currentSpeed;
     }
 
     public double getPosition() {
