@@ -63,7 +63,7 @@ public class Elevator {
             position = destinations.get(0);
             //removes only the immediate next instances of a specific destination
             while (destinations.get(0) == position) {
-                System.out.println(destinations.size());
+                System.out.println(destinations.size()); //stupid java! make me look bad
                 destinations.remove(0); //BROKEN :(
             }
             //RUN DROPOFF PROTOCOL FOR TRAVELLERS
@@ -161,7 +161,6 @@ public class Elevator {
         }
 
         //adjusts dropoff append position to account for pickup being appended
-        System.out.println("pickup: " + pickupAppendPosition + " dropoff: " + dropoffAppendPosition);
         if (pickupAppendPosition <= dropoffAppendPosition) {
             dropoffAppendPosition++;
         }
