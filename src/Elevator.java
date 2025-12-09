@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Elevator {
     private static int totalElevators = 0;
+    private static int nextID = 0;
     static ArrayList elevatorList = new ArrayList();
     private boolean isPlaceholder = false;
 
@@ -10,6 +11,7 @@ public class Elevator {
     private int capacity;
     private int maxFloor;
     private int minFloor;
+    private int id;
 
     private double currentSpeed;
     private double position; //position is in reference to floor number
@@ -27,9 +29,11 @@ public class Elevator {
         this.capacity = capacity;
         this.minFloor = minFloor;
         this.maxFloor = maxFloor;
+        id = nextID;
         position = startPosition;
 
         totalElevators++;
+        nextID++;
         elevatorList.add(this);
     }
 
@@ -61,7 +65,9 @@ public class Elevator {
 
         //goes through all elevator objects, and sets bestElevator to the one with the best dist to pickup
         for (int i = 0; i < totalElevators; i++) {
+            int tempPickupAppend = 0;
             Elevator elevator = (Elevator) elevatorList.get(i);
+            System.out.print("Running for elevator " + elevator.getID() + ": ");
             double totalDistance = 0;
             boolean endTest = false;
 
@@ -69,9 +75,10 @@ public class Elevator {
             if (elevator.getTotalDestinations() == 0) {
                 totalDistance += Math.abs(elevator.getPosition() - callerFloor);
                 endTest = true;
+                System.out.print("No destinations. ");
             }
 
-            //runs for elevator destinations 1 through n-1
+            //runs for elevators with 2 or more dests, destinations 1 through n-1
             for (int j = 0; j < (elevator.getTotalDestinations() - 1) && !endTest; j++) {
 
                 //if elevator will move past caller add the distance to the caller and end test
@@ -84,12 +91,14 @@ public class Elevator {
 
                     totalDistance += Math.abs(elevator.getPosition() - callerFloor);
                     endTest = true;
+                    System.out.print("Elevator passes by caller. ");
 
                 } else { //otherwise add distance to next destination, increment pickupAppendPosition, and continue test
 
-                    totalDistance += Math.abs((Double) elevator.getDestinations().get(j)
-                            - (Double) elevator.getDestinations().get(j + 1));
-                    pickupAppendPosition++;
+                    totalDistance += Math.abs((int) elevator.getDestinations().get(j)
+                            - (int) elevator.getDestinations().get(j + 1));
+                    tempPickupAppend++;
+                    System.out.print("Elevator does not pass caller. ");
                 }
             }
 
@@ -103,8 +112,11 @@ public class Elevator {
             if (totalDistance < bestDistance) {
                 bestDistance = totalDistance;
                 bestElevator = elevator;
+                pickupAppendPosition = tempPickupAppend;
             }
+            System.out.print("Total Distance: " + totalDistance + ". ");
         }
+        System.out.println("Best Elevator: " + bestElevator.getID() + ". Distance: " + bestDistance + ".");
 
         //finds when the elevator will pass by the dropoff position, or will change directions away from the dropoff
         boolean foundPosition = false;
@@ -146,18 +158,30 @@ public class Elevator {
 
     }
 
-    //adds a destination in the middle of an elevator's route
-    public void addDestination(int appendPosition, int floor) {
-        System.out.println("Old Pos + Dests: " + position + " and " + destinations);
-        destinations.add(appendPosition, floor);
-        System.out.println("New Pos + Dests: " + position + " and " + destinations);
+    public void directionCheck() {
+        if (totalDestinations != 0) {
+            if ((int) destinations.get(0) > position) {
+                direction = 1;
+            } else if ((int) destinations.get(0) < position) {
+                direction = -1;
+            }
+        }
     }
 
-    //adds a destination to the end of an elevator's route
+    //adds a destination in the middle of an elevator's route. Updates direction immediately.
+    public void addDestination(int appendPosition, int floor) {
+        destinations.add(appendPosition, floor);
+        totalDestinations++;
+        directionCheck();
+        System.out.println("ID: " + id + ". Loc: " + position + ". Dests: " + destinations);
+    }
+
+    //adds a destination to the end of an elevator's route. Updates direction immediately.
     public void addDestination(int floor) {
-        System.out.println("Old Pos + Dests: " + position + " and " + destinations);
         destinations.add(floor);
-        System.out.println("New Pos + Dests: " + position + " and " + destinations);
+        totalDestinations++;
+        directionCheck();
+        System.out.println("ID: " + id + ". Loc: " + position + ". Dests: " + destinations);
     }
 
 
@@ -226,4 +250,7 @@ public class Elevator {
         return occupantList;
     }
 
+    public int getID() {
+        return id;
+    }
 }
