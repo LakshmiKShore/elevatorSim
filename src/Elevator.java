@@ -16,8 +16,8 @@ public class Elevator {
     private boolean isMoving;
     private int direction; //1 is up, -1 is down
     private int occupants;
-    private ArrayList<Integer> destinations = new ArrayList<>();
-    private ArrayList<Traveller> occupantList = new ArrayList<>();
+    private ArrayList<Integer> destinations = new ArrayList<Integer>();
+    private ArrayList<Traveller> occupantList = new ArrayList<Traveller>();
 
     //constructor takes speed accel and capacity, increments totalelevators, adds itself to the array
     public Elevator(double speed, int capacity, int minFloor, int maxFloor, int startPosition) {
@@ -62,18 +62,25 @@ public class Elevator {
         } else {
             position = destinations.get(0);
             //removes only the immediate next instances of a specific destination
-            while (destinations.get(0) == position) {
-                System.out.println(destinations.size()); //stupid java! make me look bad
-                destinations.remove(0); //BROKEN :(
-                System.out.println(destinations.size());
+            while ((!destinations.isEmpty()) && (destinations.get(0) == position)) {
+                destinations.remove(0);
             }
-            //RUN DROPOFF PROTOCOL FOR TRAVELLERS
+            openDoors();
         }
         System.out.println(this);
     }
 
+    //prompts travellers to enter or exit the elevator
+    public void openDoors(){
+        for (Traveller checking : Traveller.getTravellerList()) {
+            checking.enterExit(this);
+        }
+    }
+
     //finds the elevator that can get to the caller fastest and adds the caller's current floor to its destination list.
-    public static void callElevator(int callerFloor, int destinationFloor) {
+    //Returns the elevator that was chosen, so that it can imprint upon the traveller.
+    //like in twilight.
+    public static Elevator callElevator(int callerFloor, int destinationFloor) {
 
         int callerDirection;
         //callerDirection is 1 if caller is moving upwards, -1 if downwards.
@@ -128,6 +135,9 @@ public class Elevator {
                 totalDistance += (Math.abs((int) elevator.getDestinations().get(elevator.getDestinations().size() - 1) - callerFloor));
             }
 
+            //divides totalDistance by speed
+            totalDistance /= elevator.speed;
+
             //checks if totalDistance is better than bestDistance, if so, updates bestDist and bestElevator
             if (totalDistance < bestDistance) {
                 bestDistance = totalDistance;
@@ -170,6 +180,8 @@ public class Elevator {
         bestElevator.addDestination(pickupAppendPosition, callerFloor);
         bestElevator.addDestination(dropoffAppendPosition,destinationFloor);
 
+        //returns bestElevator for imprinting
+        return bestElevator;
     }
 
     //Generic passCheck. Checks if the elevator will EVER pass a floor.
