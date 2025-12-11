@@ -7,9 +7,9 @@ public class Traveller {
     private boolean inElevator;
     private int minFloor;
     private int maxFloor;
-    private int movementChance = 50;
-    private Elevator currentElevator;
-    private Elevator imprintedElevator; //an elevator the traveller plans to enter, but has not yet.
+    private int movementChance = 1;
+    private Elevator currentElevator = new Elevator();
+    private Elevator imprintedElevator = new Elevator(); //an elevator the traveller plans to enter, but has not yet.
 
     private static ArrayList<Traveller> travellerList = new ArrayList<Traveller>();
 
@@ -54,21 +54,26 @@ public class Traveller {
     //If the traveller has a destination, and isn't in an elevator, it will call an elevator.
     //If the traveller is in an elevator, it sets its position to the elevator's position.
     public void move() {
+        System.out.println(this);
         if (destination == position) {
             if ((int) (Math.random() * movementChance) == 0) {
                 randomDestination();
             }
         } else {
-            if (!inElevator) {
+            if (!inElevator && imprintedElevator.getIsPlaceholder()) { //if the traveller has called an elevator already, does not run
                 call();
             } else {
-                position = currentElevator.getPosition();
+                if (!currentElevator.getIsPlaceholder()) {
+                    position = currentElevator.getPosition();
+                }
             }
         }
     }
 
     //runs to ask a traveller if they want to get into or out of an elevator.
     public void enterExit(Elevator e){
+        System.out.println("enterExit");
+        position = currentElevator.getPosition();
         if (!inElevator) {
             if (e == imprintedElevator) { // == is used here because the elevators must have the same reference
                 currentElevator = e;
@@ -77,6 +82,7 @@ public class Traveller {
         } else {
             if (position == destination) {
                 currentElevator = new Elevator();
+                imprintedElevator = new Elevator();
                 inElevator = false;
             }
         }
@@ -84,6 +90,7 @@ public class Traveller {
 
     //calls an elevator and imprints on it
     public void call(){
+        System.out.println("called");
         imprintedElevator = Elevator.callElevator((int) position,destination);
     }
 
@@ -93,6 +100,11 @@ public class Traveller {
 
     public void setInElevator(boolean inElevator){
         this.inElevator = inElevator;
+    }
+
+    //toString. Prints position and destinatinon.
+    public String toString() {
+        return ("Pos: " + position + " Dest: " + destination + " In Elevator: " + currentElevator.getID() + " Imprinted: " + imprintedElevator.getID());
     }
 
     public double getPosition() {

@@ -60,12 +60,12 @@ public class Elevator {
         if (Math.abs(destinations.get(0) - position) >= speed) {
             position += (speed * direction);
         } else {
+            openDoors();
             position = destinations.get(0);
             //removes only the immediate next instances of a specific destination
             while ((!destinations.isEmpty()) && (destinations.get(0) == position)) {
                 destinations.remove(0);
             }
-            openDoors();
         }
         System.out.println(this);
     }
