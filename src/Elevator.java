@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Elevator {
     private static int totalElevators = 0;
@@ -36,6 +37,7 @@ public class Elevator {
     //placeholder elevator constructor
     public Elevator() {
         this.isPlaceholder = true;
+        id = -1;
     }
 
     //runs every elevator's movement.
@@ -60,8 +62,8 @@ public class Elevator {
         if (Math.abs(destinations.get(0) - position) >= speed) {
             position += (speed * direction);
         } else {
-            openDoors();
             position = destinations.get(0);
+            openDoors();
             //removes only the immediate next instances of a specific destination
             while ((!destinations.isEmpty()) && (destinations.get(0) == position)) {
                 destinations.remove(0);
@@ -73,6 +75,7 @@ public class Elevator {
     //prompts travellers to enter or exit the elevator
     public void openDoors(){
         for (Traveller checking : Traveller.getTravellerList()) {
+            System.out.println("opening doors");
             checking.enterExit(this);
         }
     }
@@ -243,7 +246,8 @@ public class Elevator {
 
     //toString. Prints id, position, and destinations.
     public String toString() {
-        return "ID: " + id + ". Loc: " + position + ". Dests: " + destinations;
+        double roundedPos = ((int) (position * 100))/100.0;
+        return "ID: " + id + ". Loc: " + roundedPos + ". Dests: " + destinations;
     }
 
     //getter methods

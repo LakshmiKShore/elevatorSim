@@ -73,14 +73,15 @@ public class Traveller {
     //runs to ask a traveller if they want to get into or out of an elevator.
     public void enterExit(Elevator e){
         System.out.println("enterExit");
-        position = currentElevator.getPosition();
         if (!inElevator) {
             if (e == imprintedElevator) { // == is used here because the elevators must have the same reference
                 currentElevator = e;
                 inElevator = true;
             }
         } else {
+            position = currentElevator.getPosition();
             if (position == destination) {
+                System.out.println("clearing elevators");
                 currentElevator = new Elevator();
                 imprintedElevator = new Elevator();
                 inElevator = false;
@@ -104,7 +105,8 @@ public class Traveller {
 
     //toString. Prints position and destinatinon.
     public String toString() {
-        return ("Pos: " + position + " Dest: " + destination + " In Elevator: " + currentElevator.getID() + " Imprinted: " + imprintedElevator.getID());
+        double roundedPos = ((int) (position * 100))/100.0;
+        return ("Pos: " + roundedPos + " Dest: " + destination + " In Elevator: " + currentElevator.getID() + " Imprinted: " + imprintedElevator.getID());
     }
 
     public double getPosition() {
