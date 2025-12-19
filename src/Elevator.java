@@ -8,24 +8,17 @@ public class Elevator {
     private boolean isPlaceholder = false;
 
     private double speed; //speed is in floors per tick
-    private int capacity;
-    private int maxFloor;
-    private int minFloor;
     private int id;
 
     private double position; //position is in reference to floor number
     private boolean isMoving;
     private int direction; //1 is up, -1 is down
-    private int occupants;
     private ArrayList<Integer> destinations = new ArrayList<Integer>();
     private ArrayList<Traveller> occupantList = new ArrayList<Traveller>();
 
-    //constructor takes speed accel and capacity, increments totalelevators, adds itself to the array
-    public Elevator(double speed, int capacity, int minFloor, int maxFloor, int startPosition) {
+    //constructor takes speed and accel, increments totalelevators, adds itself to the array
+    public Elevator(double speed, int startPosition) {
         this.speed = speed;
-        this.capacity = capacity;
-        this.minFloor = minFloor;
-        this.maxFloor = maxFloor;
         id = nextID;
         position = startPosition;
 
@@ -45,6 +38,7 @@ public class Elevator {
         //is broken :(
         for (Elevator ticking : elevatorList) {
             ticking.move();
+            System.out.println(ticking);
         }
     }
 
@@ -69,13 +63,12 @@ public class Elevator {
                 destinations.remove(0);
             }
         }
-        System.out.println(this);
     }
 
     //prompts travellers to enter or exit the elevator
     public void openDoors(){
+        System.out.println("opening doors on floor " + position);
         for (Traveller checking : Traveller.getTravellerList()) {
-            System.out.println("opening doors");
             checking.enterExit(this);
         }
     }
@@ -234,17 +227,15 @@ public class Elevator {
     public void addDestination(int appendPosition, int floor) {
         destinations.add(appendPosition, floor);
         directionCheck();
-        System.out.println(this);
     }
 
     //adds a destination to the end of an elevator's route. Updates direction immediately.
     public void addDestination(int floor) {
         destinations.add(floor);
         directionCheck();
-        System.out.println(this);
     }
 
-    //toString. Prints id, position, and destinations.
+    //toString. Prints id, number of passengers, position, and destinations.
     public String toString() {
         double roundedPos = ((int) (position * 100))/100.0;
         return "ID: " + id + ". Loc: " + roundedPos + ". Dests: " + destinations;
@@ -259,18 +250,6 @@ public class Elevator {
         return speed;
     }
 
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public int getMaxFloor() {
-        return maxFloor;
-    }
-
-    public int getMinFloor() {
-        return minFloor;
-    }
-
     public double getPosition() {
         return position;
     }
@@ -281,10 +260,6 @@ public class Elevator {
 
     public int getDirection() {
         return direction;
-    }
-
-    public int getOccupants() {
-        return occupants;
     }
 
     public boolean getIsPlaceholder() {

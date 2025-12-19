@@ -46,6 +46,7 @@ public class Traveller {
     public static void tick() {
         for (Traveller ticking : travellerList){
             ticking.move();
+            System.out.println(ticking);
         }
     }
 
@@ -54,7 +55,6 @@ public class Traveller {
     //If the traveller has a destination, and isn't in an elevator, it will call an elevator.
     //If the traveller is in an elevator, it sets its position to the elevator's position.
     public void move() {
-        System.out.println(this);
         if (destination == position) {
             if ((int) (Math.random() * movementChance) == 0) {
                 randomDestination();
@@ -72,7 +72,6 @@ public class Traveller {
 
     //runs to ask a traveller if they want to get into or out of an elevator.
     public void enterExit(Elevator e){
-        System.out.println("enterExit");
         if (!inElevator) {
             if (e == imprintedElevator) { // == is used here because the elevators must have the same reference
                 currentElevator = e;
@@ -81,7 +80,6 @@ public class Traveller {
         } else {
             position = currentElevator.getPosition();
             if (position == destination) {
-                System.out.println("clearing elevators");
                 currentElevator = new Elevator();
                 imprintedElevator = new Elevator();
                 inElevator = false;
