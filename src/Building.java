@@ -9,6 +9,7 @@ public class Building {
     private int groundFloor;
     private double busyness;
 
+    ArrayList<Dataset> datasets = new ArrayList<Dataset>();
     ArrayList<Elevator> elevators = new ArrayList<Elevator>();
     ArrayList<Traveller> travellers = new ArrayList<Traveller>();
 
@@ -26,7 +27,7 @@ public class Building {
     //creates elevators until there are NumElevators elevators
     public void createElevators(){
         for (int i = elevators.size(); i < numElevators; i++){
-            elevators.add(new Elevator(elevatorSpeed,groundFloor));
+            elevators.add(new Elevator(elevatorSpeed,groundFloor,this));
         }
     }
 
@@ -45,6 +46,7 @@ public class Building {
                 travellers.add(new Traveller(minFloor, maxFloor, groundFloor));
             }
         }
+        getData(ticks);
     }
 
     //runs the simulation for one tick.
@@ -53,6 +55,40 @@ public class Building {
         Traveller.tick();
     }
 
+    //retrieves data from all elevators and travellers, and passes it to the master dataset.
+    public void getData(int ticks) {
+
+        //gets elevator statistics, puts in arrays
+        double[] eleTravelDist = new double[elevators.size()];
+        for (int i = 0; i < elevators.size(); i++) {
+            eleTravelDist[i] = elevators.get(i).getTotalDistance();
+        }
+        int[] eleIdleTime = new int[elevators.size()];
+        for (int i = 0; i < elevators.size(); i++) {
+            eleIdleTime[i] = elevators.get(i).getIdleTime();
+        }
+        int[] eleTimesCalled = new int[elevators.size()];
+        for (int i = 0; i < elevators.size(); i++) {
+            eleTimesCalled[i] = elevators.get(i).getTimesCalled();
+        }
+
+        //gets traveller statistics, puts in arrays
+        int[] trTotalTime = new int[travellers.size()];
+        for (int i = 0; i < travellers.size(); i++) {
+            trTotalTime[i] = travellers.get(i).getTotalTime();
+        }
+        int[] trTimeWaiting = new int[travellers.size()];
+        for (int i = 0; i < travellers.size(); i++) {
+            trTimeWaiting[i] = travellers.get(i).getTotalTime();
+        }
+        int[] trNumCalls = new int[travellers.size()];
+        for (int i = 0; i < travellers.size(); i++) {
+            trNumCalls[i] = travellers.get(i).getNumCalls();
+        }
+
+        //creates a new dataset, passes through all the values we just got, plus some building values.
+        datasets.add(new Dataset(ticks, minFloor, maxFloor, eleTravelDist, eleIdleTime, eleTimesCalled, trTotalTime, trTimeWaiting, trNumCalls));
+    }
 
     //getters
     public int getMinFloor() {

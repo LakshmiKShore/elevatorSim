@@ -11,6 +11,10 @@ public class Traveller {
     private Elevator currentElevator = new Elevator();
     private Elevator imprintedElevator = new Elevator(); //an elevator the traveller plans to enter, but has not yet.
 
+    private int timeWaiting = 0; //tracks the total number of ticks spent waiting for an elevator to arrive
+    private int numCalls = 0; //tracks the total number of times the traveller has called an elevator
+    private int totalTime = 0; //tracks the total number of ticks the traveller has existed
+
     private static ArrayList<Traveller> travellerList = new ArrayList<Traveller>();
 
     //generic constructor (no params)
@@ -35,8 +39,8 @@ public class Traveller {
 
     //Sets the Traveller's destination to a random floor between minFloor and maxFloor that it is not currently on.
     public void randomDestination() {
-        int rand = -99999;
-        while (rand == -99999 || rand == position) {
+        int rand = minFloor - 1;
+        while (rand == minFloor - 1 || rand == position) {
             rand = (int) (Math.random() * maxFloor) + 1 + minFloor;
         }
         destination = rand;
@@ -55,16 +59,20 @@ public class Traveller {
     //If the traveller has a destination, and isn't in an elevator, it will call an elevator.
     //If the traveller is in an elevator, it sets its position to the elevator's position.
     public void move() {
-        if (destination == position) {
+        totalTime++;
+
+        if (destination == position) { //if the traveller is NOT trying to go somewhere
             if ((int) (Math.random() * movementChance) == 0) {
                 randomDestination();
             }
-        } else {
-            if (!inElevator && imprintedElevator.getIsPlaceholder()) { //if the traveller has called an elevator already, does not run
+        } else { //if the traveller IS trying to go somewhere
+            if (!inElevator && imprintedElevator.getIsPlaceholder()) { //but has NOT already called an elevator
                 call();
-            } else {
-                if (!currentElevator.getIsPlaceholder()) {
+            } else { //and HAS already called an elevator
+                if (!currentElevator.getIsPlaceholder()) { //and IS in an elevator
                     position = currentElevator.getPosition();
+                } else { //but is NOT in an elevator
+                    timeWaiting++; //then they must be waiting
                 }
             }
         }
@@ -89,6 +97,7 @@ public class Traveller {
 
     //calls an elevator and imprints on it
     public void call(){
+        numCalls++;
         System.out.println("called");
         imprintedElevator = Elevator.callElevator((int) position,destination);
     }
@@ -137,6 +146,18 @@ public class Traveller {
 
     public static ArrayList<Traveller> getTravellerList() {
         return travellerList;
+    }
+
+    public int getTimeWaiting() {
+        return timeWaiting;
+    }
+
+    public int getNumCalls() {
+        return numCalls;
+    }
+
+    public int getTotalTime() {
+        return totalTime;
     }
 
 }

@@ -4,21 +4,27 @@ import java.util.Arrays;
 public class Elevator {
     private static int totalElevators = 0;
     private static int nextID = 0;
-    static ArrayList<Elevator> elevatorList = new ArrayList<>();
+    private static ArrayList<Elevator> elevatorList = new ArrayList<>();
     private boolean isPlaceholder = false;
 
     private double speed; //speed is in floors per tick
     private int id;
+    private Building parentBuilding;
+
+    private double totalDistance = 0; //tracks the total distance an elevator has moved throughout a simulation
+    private int idleTime = 0; //tracks the number of ticks where an elevator did nothing
+    private int timesCalled = 0; //tracks the number of times an elevator was called
 
     private double position; //position is in reference to floor number
     private boolean isMoving;
     private int direction; //1 is up, -1 is down
     private ArrayList<Integer> destinations = new ArrayList<Integer>();
-    private ArrayList<Traveller> occupantList = new ArrayList<Traveller>();
+    private ArrayList<Traveller> occupantList = new ArrayList<Traveller>(); //Not currently used, could be removed without consequence
 
-    //constructor takes speed and accel, increments totalelevators, adds itself to the array
-    public Elevator(double speed, int startPosition) {
+    //constructor takes speed, increments totalelevators, adds itself to the array
+    public Elevator(double speed, int startPosition, Building parentBuilding) {
         this.speed = speed;
+        this.parentBuilding = parentBuilding;
         id = nextID;
         position = startPosition;
 
@@ -48,6 +54,7 @@ public class Elevator {
 
         //if there are no destinations, ABORT ABORT ABORT
         if (destinations.isEmpty()) {
+            idleTime++;
             return;
         }
 
@@ -55,7 +62,9 @@ public class Elevator {
         //otherwise, we can safely set our position to our destination
         if (Math.abs(destinations.get(0) - position) >= speed) {
             position += (speed * direction);
+            totalDistance += (speed * direction); //tracks distance moved
         } else {
+            totalDistance += Math.abs(destinations.get(0) - position); //tracks distance moved
             position = destinations.get(0);
             openDoors();
             //removes only the immediate next instances of a specific destination
@@ -176,6 +185,9 @@ public class Elevator {
         bestElevator.addDestination(pickupAppendPosition, callerFloor);
         bestElevator.addDestination(dropoffAppendPosition,destinationFloor);
 
+        //increments timesCalled for bestElevator
+        bestElevator.called();
+
         //returns bestElevator for imprinting
         return bestElevator;
     }
@@ -241,6 +253,11 @@ public class Elevator {
         return "ID: " + id + ". Loc: " + roundedPos + ". Dests: " + destinations;
     }
 
+    //increments timesCalled
+    public void called() {
+        timesCalled++;
+    }
+
     //getter methods
     public static int getTotalElevators() {
         return totalElevators;
@@ -266,19 +283,31 @@ public class Elevator {
         return isPlaceholder;
     }
 
-    public ArrayList getElevatorList() {
+    public ArrayList<Elevator> getElevatorList() {
         return elevatorList;
     }
 
-    public ArrayList getDestinations() {
+    public ArrayList<Integer> getDestinations() {
         return destinations;
     }
 
-    public ArrayList getOccupantList() {
+    public ArrayList<Traveller> getOccupantList() {
         return occupantList;
     }
 
     public int getID() {
         return id;
+    }
+
+    public double getTotalDistance() {
+        return totalDistance;
+    }
+
+    public int getIdleTime() {
+        return idleTime;
+    }
+
+    public int getTimesCalled() {
+        return timesCalled;
     }
 }
