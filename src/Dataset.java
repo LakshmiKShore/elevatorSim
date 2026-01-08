@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Dataset {
 
     private int simTicks;
@@ -12,6 +14,8 @@ public class Dataset {
     private int[] tTimePresent;
     private int[] tTimeWaiting;
     private int[] tNumCalls;
+
+    private static ArrayList<Dataset> datasets = new ArrayList<Dataset>();
 
     //Full constructor. takes a lot of inputs. Building.getData handles it.
     public Dataset(int simTicks, int bMinFloor, int bMaxFloor, double[] eTravelDist, int[] eTimeWaiting,
@@ -29,10 +33,123 @@ public class Dataset {
         totalFloors = bMaxFloor - bMinFloor;
         numElevators = eTravelDist.length;
         numTravellers = tTimePresent.length;
+
+        datasets.add(this); //adds itself to the list of datasets
     }
 
-    //calculates
-    public double eIdleTickPercent() {
+    //prints every dataset's statistics.
+    public static void reportAll() {
+        for (Dataset d : datasets) {
+            d.printStatistics();
+        }
+    }
 
+    //prints the idle tick percent for elevators and travellers, and the average elevator travel distance per call.
+    public void printStatistics() {
+        System.out.println("Elevators were idle for an average of " + (eIdleTickPercent() * 100) + "% of the simulation.");
+        System.out.println("Elevators travelled an average of " + eTravelDistPerCall() + " floors per call.");
+        System.out.println("Travellers were idle for an average of " + tTimeIdlePerCall() + " ticks after each call.");
+    }
+
+
+    //Below are instance methods which calculate various statistics about data.
+
+    //calculates the average percentage of time that elevators spend waiting. Returns a double between 0 and 1 (inclusive).
+    public double eIdleTickPercent() {
+        return average(eTimeWaiting)/simTicks;
+    }
+
+    //calculates the average distance (floors) that an elevator travels, per time it was called. Returns a double.
+    public double eTravelDistPerCall() {
+        return average(arrayDiv(eTravelDist,eNumCalls)); //Should update to use the distance that a call requested the elevator to travel
+    }                                                    //to better represent the efficiency of overlapping calls.
+
+    //calculates the average number of ticks per call that a traveller spends waiting for an elevator to arrive.
+    public double tTimeIdlePerCall() {
+        return average(arrayDiv(tTimeWaiting,tNumCalls));
+    }
+
+
+    //Below are static arrayformula methods. They run basic calculations on integer and double arrays.
+    //For arrayformulas involving two or more arrays, all arrays must be the same length.
+
+    //returns the average value of an integer array.
+    public static double average(int[] arr) {
+        return (double) sum(arr)/arr.length;
+    }
+
+    //returns the average value of a double array.
+    public static double average(double[] arr) {
+        return sum(arr)/arr.length;
+    }
+
+    //returns the sum of an integer array.
+    public static int sum(int[] arr) {
+        int sum = 0;
+        for (int a : arr) {
+            sum += a;
+        }
+        return sum;
+    }
+
+    //returns the sum of a double array.
+    public static double sum(double[] arr) {
+        double sum = 0;
+        for (double a : arr) {
+            sum += a;
+        }
+        return sum;
+    }
+
+    //divides the elements of two integer arrays. returns a double array. returns {-1.0} when fed two arrays with different lengths.
+    public static double[] arrayDiv(int[] divided, int[] divisor) {
+        if (divided.length != divisor.length) {
+            return new double[-1];
+        } else {
+            double[] result = new double[divided.length];
+            for (int i = 0; i < divided.length; i++) {
+                result[i] = (double) divided[i]/divisor[i];
+            }
+            return result;
+        }
+    }
+
+    //divides the elements a double array by an int array. returns a double array. returns {-1.0} when fed two arrays with different lengths.
+    public static double[] arrayDiv(double[] divided, int[] divisor) {
+        if (divided.length != divisor.length) {
+            return new double[-1];
+        } else {
+            double[] result = new double[divided.length];
+            for (int i = 0; i < divided.length; i++) {
+                result[i] = (double) divided[i]/divisor[i];
+            }
+            return result;
+        }
+    }
+
+    //divides the elements an int array by a double array. returns a double array. returns {-1.0} when fed two arrays with different lengths.
+    public static double[] arrayDiv(int[] divided, double[] divisor) {
+        if (divided.length != divisor.length) {
+            return new double[-1];
+        } else {
+            double[] result = new double[divided.length];
+            for (int i = 0; i < divided.length; i++) {
+                result[i] = (double) divided[i]/divisor[i];
+            }
+            return result;
+        }
+    }
+
+    //divides the elements of two double arrays. returns a double array. returns {-1.0} when fed two arrays with different lengths.
+    public static double[] arrayDiv(double[] divided, double[] divisor) {
+        if (divided.length != divisor.length) {
+            return new double[-1];
+        } else {
+            double[] result = new double[divided.length];
+            for (int i = 0; i < divided.length; i++) {
+                result[i] = (double) divided[i]/divisor[i];
+            }
+            return result;
+        }
     }
 }

@@ -44,7 +44,6 @@ public class Elevator {
         //is broken :(
         for (Elevator ticking : elevatorList) {
             ticking.move();
-            System.out.println(ticking);
         }
     }
 
@@ -62,7 +61,7 @@ public class Elevator {
         //otherwise, we can safely set our position to our destination
         if (Math.abs(destinations.get(0) - position) >= speed) {
             position += (speed * direction);
-            totalDistance += (speed * direction); //tracks distance moved
+            totalDistance += speed; //tracks distance moved
         } else {
             totalDistance += Math.abs(destinations.get(0) - position); //tracks distance moved
             position = destinations.get(0);
@@ -76,7 +75,6 @@ public class Elevator {
 
     //prompts travellers to enter or exit the elevator
     public void openDoors(){
-        System.out.println("opening doors on floor " + position);
         for (Traveller checking : Traveller.getTravellerList()) {
             checking.enterExit(this);
         }

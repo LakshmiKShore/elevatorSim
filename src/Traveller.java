@@ -50,7 +50,6 @@ public class Traveller {
     public static void tick() {
         for (Traveller ticking : travellerList){
             ticking.move();
-            System.out.println(ticking);
         }
     }
 
@@ -98,7 +97,6 @@ public class Traveller {
     //calls an elevator and imprints on it
     public void call(){
         numCalls++;
-        System.out.println("called");
         imprintedElevator = Elevator.callElevator((int) position,destination);
     }
 

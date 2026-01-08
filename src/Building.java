@@ -36,13 +36,10 @@ public class Building {
     //travellers should be more likely early in the day due to this.
     public void simulate(int ticks){
         for (int i = 0; i < ticks; i++){
-            System.out.println("");
-            System.out.println("Tick Number " + (i + 1));
             tick();
 
             double travellerChance = 1 - Math.random() + (double) i/ticks;
             if (travellerChance < busyness) {
-                System.out.println("Another traveller has hit the world trade center");
                 travellers.add(new Traveller(minFloor, maxFloor, groundFloor));
             }
         }
