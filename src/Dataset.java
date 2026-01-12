@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Dataset {
 
-    public static int nextID = 0;
+    public static int nextID = 1;
 
     private int id;
     private int simTicks;
