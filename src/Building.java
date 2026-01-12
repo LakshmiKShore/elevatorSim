@@ -8,26 +8,38 @@ public class Building {
     private double elevatorSpeed;
     private int groundFloor;
     private double busyness;
+    private boolean addTravellers;
+    private int startingTravellers;
 
     ArrayList<Dataset> datasets = new ArrayList<Dataset>();
     ArrayList<Elevator> elevators = new ArrayList<Elevator>();
     ArrayList<Traveller> travellers = new ArrayList<Traveller>();
 
     //fully customizable building constructor. Creates elevators. Busyness is a double between 0 and 1.
-    public Building(int minFloor, int maxFloor, int numElevators, double elevatorSpeed, int groundFloor, double busyness){
+    public Building(int minFloor, int maxFloor, int numElevators, double elevatorSpeed, int groundFloor, double busyness, int startingTravellers, boolean addTravellers){
         this.minFloor = minFloor;
         this.maxFloor = maxFloor;
         this.numElevators = numElevators;
         this.elevatorSpeed = elevatorSpeed;
         this.groundFloor = groundFloor;
         this.busyness = busyness;
+        this.startingTravellers = startingTravellers;
+        this.addTravellers = addTravellers;
         createElevators();
+        createTravellers();
     }
 
     //creates elevators until there are NumElevators elevators
     public void createElevators(){
         for (int i = elevators.size(); i < numElevators; i++){
             elevators.add(new Elevator(elevatorSpeed,groundFloor,this));
+        }
+    }
+
+    //creates travellers until there are startingTravellers travellers
+    public void createTravellers(){
+        for (int i = travellers.size(); i < startingTravellers; i++){
+            travellers.add(new Traveller(minFloor,maxFloor,groundFloor));
         }
     }
 
@@ -39,7 +51,7 @@ public class Building {
             tick();
 
             double travellerChance = 1 - Math.random() + (double) i/ticks;
-            if (travellerChance < busyness) {
+            if (travellerChance < busyness && addTravellers) {
                 travellers.add(new Traveller(minFloor, maxFloor, groundFloor));
             }
         }
