@@ -118,6 +118,7 @@ public class Runner {
                 x.simulate(ticks);
             }
         }
+        Dataset.reportAll();
     }
     
 }
