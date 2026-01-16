@@ -5,6 +5,8 @@ public class Runner {
         experimentHandler();
     }
 
+
+
     //interfaces with the runExperiment method, asking
     public static void experimentHandler() {
         Scanner scanner = new Scanner(System.in);
@@ -112,6 +114,10 @@ public class Runner {
 
     }
 
+    //Runs a series of simulations and returns data about them.
+    //Takes an array of buildings (where all factors are the same, except the independent variable),
+    //an int representing how many trials to do on each state of the independent variable,
+    //and an int representing how long to run each simulation for.
     public static void runExperiment(Building[] b, int numTrials, int ticks) {
         for (Building x : b) {
             for (int i = 0; i < numTrials; i++) {

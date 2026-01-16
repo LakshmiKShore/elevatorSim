@@ -127,4 +127,8 @@ public class Building {
     public ArrayList<Traveller> getTravellers() {
         return travellers;
     }
+
+    public ArrayList<Dataset> getDatasets() {
+        return datasets;
+    }
 }
